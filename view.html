@@ -1,18 +1,14 @@
-// هيجيب بس الصور اللي تخص الجهاز ده
-const myId = localStorage.getItem('userId');
-db.ref('results/' + myId).on('child_added', (snapshot) => {
-    const data = snapshot.val();
-    const div = document.createElement('div');
-    div.innerHTML = `
-        <img src="${data.photo}" style="width:100%; border-radius:10px;">
-        <button onclick="saveImage('${data.photo}')">حفظ 📥</button>
-    `;
-    document.getElementById('list').prepend(div);
-});
-
-function saveImage(base64) {
+function saveToGallery(base64) {
+    // كود تحويل الصورة لملف حقيقي للتحميل في المعرض
+    const byteString = atob(base64.split(',')[1]);
+    const mimeString = base64.split(',')[0].split(':')[1].split(';')[0];
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) { ia[i] = byteString.charCodeAt(i); }
+    const blob = new Blob([ab], {type: mimeString});
+    
     const link = document.createElement('a');
-    link.href = base64;
-    link.download = `photo_${Date.now()}.jpg`;
+    link.href = URL.createObjectURL(blob);
+    link.download = `صيدة_المشاكس_${Date.now()}.jpg`;
     link.click();
 }
